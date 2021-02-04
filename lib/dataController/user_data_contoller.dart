@@ -19,7 +19,7 @@ class UserController extends GetxController {
 
     snapshot.docs.forEach((document) {
       UserModel userModel = UserModel.fromMap(document.data());
-      _userList.add(userModel);
+      _userLista.add(userModel);
     });
 
     userController._userList = _userLista;

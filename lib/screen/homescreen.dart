@@ -24,8 +24,9 @@ class _HomeScreenState extends State<HomeScreen> {
     //   });
     // });
     // Load data form firestore to getX
-    final controller = Get.put(PostController());
-    controller.getPost(controller);
+
+    // final controller = Get.put(PostController());
+    // controller.getPost(controller);
     super.initState();
   }
 

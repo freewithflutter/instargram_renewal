@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:instargram_renewal/provider/google_sign_in_provider.dart';
 import 'package:instargram_renewal/screen/homescreen.dart';
 import 'package:instargram_renewal/screen/loginScreen/login_main.dart';
+import 'package:instargram_renewal/screen/message_screen/message_detail.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'screen/app.dart';
-import 'screen/message.dart';
+import 'screen/message_screen/message.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.blue,
           ),
           routes: {
+            MessageDetail.id: (context) => MessageDetail(),
             Message.id: (context) => Message(),
           },
           home: LoginMain()),

@@ -1,15 +1,17 @@
 import 'dart:ui';
-
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get.dart';
+import 'package:instargram_renewal/dataController/post_data_controller.dart';
+import 'package:instargram_renewal/dataController/user_data_contoller.dart';
 import 'package:instargram_renewal/provider/google_sign_in_provider.dart';
-import 'package:instargram_renewal/screen/message.dart';
+import 'package:instargram_renewal/screen/message_screen/message.dart';
 import 'package:instargram_renewal/screen/mylikes_screen/mylikes_main.dart';
 import 'package:instargram_renewal/screen/mypage_screen/mypage_main.dart';
 import 'package:instargram_renewal/screen/searchPost_screen/searchPost_main.dart';
@@ -35,6 +37,12 @@ class _AppState extends State<App> {
         'profileImage': _user.photoURL,
         'likes': [],
       });
+      //userlist
+      final controller_user = Get.put(UserController());
+      controller_user.GetUser(controller_user);
+      //Post
+      final controller = Get.put(PostController());
+      controller.getPost(controller);
     });
 
     super.initState();
