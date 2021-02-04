@@ -38,17 +38,17 @@ class GoogleSigninController extends GetxController {
       await FirebaseAuth.instance.signInWithCredential(credential);
       isSigningIn = false;
 
-      Future.delayed(Duration.zero, () async {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(_user.uid)
-            .set({
-          'name': _user.displayName,
-          'email': _user.email,
-        });
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('users').get();
+
+      final allData = snapshot.docs.forEach((document) {
+        var list = document.id;
+        return list;
       });
     }
   }
+
+  Future putUserdata() {}
 
   void logout() async {
     await googleSignIn.disconnect();

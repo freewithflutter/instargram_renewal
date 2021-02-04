@@ -7,16 +7,20 @@ class Post {
   int message;
   String profileImage;
   String userName;
+  String postID;
+  List images;
 
   Post(this.description, this.image, this.likes, this.message,
-      this.profileImage, this.userName);
+      this.profileImage, this.userName, this.postID, this.images);
 
-  Post.fromDocumentSnapshot(DocumentSnapshot ds) {
-    description = ds['description'];
-    image = ds['image'];
-    likes = ds['likes'];
-    message = ds['message'];
-    profileImage = ds['profileImage'];
-    userName = ds['userName'];
+  Post.fromMap(Map<String, dynamic> data) {
+    description = data['description'];
+    image = data['image'];
+    likes = data['likes'];
+    message = data['message'];
+    profileImage = data['profileImage'];
+    userName = data['userName'];
+    postID = data['postID'];
+    images = data['images'];
   }
 }

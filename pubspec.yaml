@@ -37,6 +37,9 @@ dependencies:
   google_sign_in: ^4.5.9
   provider: ^4.3.3
   get:
+  favorite_button: ^0.0.3
+  flutter_swiper: ^1.1.6
+
 
 dev_dependencies:
   flutter_test:
@@ -56,10 +59,10 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  #assets:
-    #- assets/images/
-    #- assets/logo/
-    #- assets/icons/
+#  assets:
+#    - assets/images/
+#    - assets/logo/
+#    - assets/icons/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

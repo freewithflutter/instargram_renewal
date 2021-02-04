@@ -3,39 +3,25 @@ import 'package:get/get.dart';
 import 'package:instargram_renewal/model/user_model.dart';
 
 class UserController extends GetxController {
-  Rx<UserModel> _userModel = UserModel().obs;
+  List<UserModel> _userList = [];
 
-  Rx<UserModel> get userModel => _userModel;
+  List<UserModel> get userList => _userList;
 
-  set userModel(Rx<UserModel> value) {
-    _userModel = value;
+  set userList(List<UserModel> value) {
+    _userList = value;
+    update();
   }
 
-  void clear() {
-    _userModel.value = userModel();
-  }
+  GetUser(UserController userController) async {
+    QuerySnapshot snapshot =
+        await FirebaseFirestore.instance.collection('users').get();
+    List<UserModel> _userLista = [];
 
-  final _firestore = FirebaseFirestore.instance;
+    snapshot.docs.forEach((document) {
+      UserModel userModel = UserModel.fromMap(document.data());
+      _userList.add(userModel);
+    });
 
-  Future<bool> createNewUser(UserModel user) async {
-    try {
-      await _firestore
-          .collection('users')
-          .doc(user.id)
-          .set({'name': user.name, 'email': user.email});
-    } catch (e) {
-      print(e);
-      return false;
-    }
-
-    Future<UserModel> getUser(String uid) async {
-      try {
-        DocumentSnapshot doc =
-            await _firestore.collection('users').doc(uid).get();
-        return UserModel.fromDocumentSnapshot(doc);
-      } catch (e) {
-        print(e);
-      }
-    }
+    userController._userList = _userLista;
   }
 }

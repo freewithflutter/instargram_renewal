@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,6 +11,7 @@ import '../app.dart';
 class LoginMain extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final _user = FirebaseAuth.instance.currentUser;
     final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
     return StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),

@@ -6,6 +6,7 @@ import 'package:instargram_renewal/screen/loginScreen/login_main.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'screen/app.dart';
+import 'screen/message.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,6 +37,9 @@ class MyApp extends StatelessWidget {
             // is not restarted.
             primarySwatch: Colors.blue,
           ),
+          routes: {
+            Message.id: (context) => Message(),
+          },
           home: LoginMain()),
     );
   }
