@@ -89,36 +89,42 @@ class _MessageState extends State<Message> {
                               !FirebaseFirestore.instance
                                       .collection('chats')
                                       .id
-                                      .contains(controller.userList[index].uid)
+                                      .contains(uid)
                                   ? null
                                   : FirebaseFirestore.instance
                                       .collection('chats')
                                       .doc(controller.userList[index].uid)
                                       .set({'uid': _user.currentUser.uid});
                             },
-                            child: Container(
-                              padding: EdgeInsets.only(bottom: 20),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    child: CircleAvatar(
-                                      radius: 26,
-                                      backgroundImage: NetworkImage(controller
-                                          .userList[index].profileImage),
+                            child: controller.userList[index].uid ==
+                                    _user.currentUser.uid
+                                ? Container()
+                                : Container(
+                                    padding: EdgeInsets.only(bottom: 20),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          child: CircleAvatar(
+                                            radius: 26,
+                                            backgroundImage: NetworkImage(
+                                                controller.userList[index]
+                                                    .profileImage),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 20,
+                                        ),
+                                        Text(
+                                          controller.userList[index].name,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  SizedBox(
-                                    width: 20,
-                                  ),
-                                  Text(
-                                    controller.userList[index].name,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ),
                           );
                         });
                   }),
