@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:instargram_renewal/dataController/google_login_controller.dart';
@@ -69,7 +71,12 @@ class _MessageState extends State<Message> {
                   itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(
                       onTap: () {
+                        String uid = controller.userList[index].uid;
+                        controller.selectedUid = uid;
+                        FirebaseFirestore.instance.collection('chats').id;
+
                         Get.to(MessageDetail());
+                        print(controller.userList[index].uid);
                       },
                       child: Container(
                         padding: EdgeInsets.only(bottom: 20),

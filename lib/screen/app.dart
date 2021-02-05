@@ -36,6 +36,7 @@ class _AppState extends State<App> {
         'email': _user.email,
         'profileImage': _user.photoURL,
         'likes': [],
+        'uid': _user.uid,
       });
       //userlist
       final controller_user = Get.put(UserController());

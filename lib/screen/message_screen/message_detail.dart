@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:instargram_renewal/dataController/user_data_contoller.dart';
+import 'package:get/get.dart';
 
 class MessageDetail extends StatefulWidget {
   static String id = 'messageDetail';
@@ -11,48 +13,84 @@ class MessageDetail extends StatefulWidget {
 }
 
 class _MessageDetailState extends State<MessageDetail> {
+  final controller = Get.put(UserController());
   String message;
-  TextEditingController messages = TextEditingController();
+  final _messages = TextEditingController();
   final _user = FirebaseAuth.instance.currentUser;
+  bool _error = false;
+  bool _switch = true;
+  @override
+  void dispose() {
+    _messages.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('message'),
+        title: GestureDetector(
+            onTap: () {
+              setState(() {
+                _switch = !_switch;
+              });
+            },
+            child: Text('message')),
       ),
       body: Container(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Expanded(
+              child: Container(
+                color: Colors.redAccent,
+                child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('chats')
+                        .doc(controller.selectedUid)
+                        .collection('message')
+                        .orderBy('timeStamp', descending: false)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      return ListView.builder(
+                        itemCount: snapshot.data.docs.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Container(
+                            child: Text(
+                                snapshot.data.docs[index].data()['message'],
+                                textAlign: TextAlign.end),
+                          );
+                        },
+                      );
+                    }),
+              ),
+            ),
             Container(
               padding: EdgeInsets.all(16),
               child: TextFormField(
                 onChanged: (value) => setState(() {
                   message = value;
                 }),
-                controller: messages,
+                controller: _messages,
                 textCapitalization: TextCapitalization.sentences,
                 autocorrect: true,
                 enableSuggestions: true,
                 decoration: InputDecoration(
+                  errorText: _error ? 'No value' : null,
                   suffixIcon: GestureDetector(
                     onTap: () {
-                      // Map<String, dynamic> data = {
-                      //   'message': messages.text,
-                      // };
-                      String dam = message;
-
                       message.isEmpty
                           ? null
                           : FirebaseFirestore.instance
                               .collection('chats')
-                              .doc(_user.uid)
+                              .doc()
                               .collection('message')
-                              .doc('DmWEPlC3DHMWRte1eAiA')
-                              .update({
-                              'message': FieldValue.arrayUnion([dam]),
+                              .add({
+                              'message': message,
+                              'timeStamp': DateTime.now()
                             });
-                      messages.clear();
+
+                      _messages.clear();
                     },
                     child: Icon(Icons.send),
                   ),
@@ -64,27 +102,6 @@ class _MessageDetailState extends State<MessageDetail> {
                   ),
                 ),
               ),
-            ),
-            Container(
-              height: 400,
-              child: StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection('chats')
-                      .doc(_user.uid)
-                      .collection('message')
-                      .doc('DmWEPlC3DHMWRte1eAiA')
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    return ListView.builder(
-                      itemBuilder: (BuildContext context, int index) {
-                        return Container(
-                          child: Text(snapshot.data
-                              .data()['message'][index]
-                              .toString()),
-                        );
-                      },
-                    );
-                  }),
             ),
           ],
         ),

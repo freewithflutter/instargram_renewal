@@ -4,8 +4,14 @@ import 'package:instargram_renewal/model/user_model.dart';
 
 class UserController extends GetxController {
   List<UserModel> _userList = [];
-
+  String _selectedUid;
   List<UserModel> get userList => _userList;
+
+  String get selectedUid => _selectedUid;
+
+  set selectedUid(String value) {
+    _selectedUid = value;
+  }
 
   set userList(List<UserModel> value) {
     _userList = value;
