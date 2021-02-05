@@ -66,42 +66,61 @@ class _MessageState extends State<Message> {
             //TODO message list part Section2
             Container(
               height: 500,
-              child: ListView.builder(
-                  itemCount: controller.userList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return GestureDetector(
-                      onTap: () {
-                        String uid = controller.userList[index].uid;
-                        controller.selectedUid = uid;
-                        FirebaseFirestore.instance.collection('chats').id;
-
-                        Get.to(MessageDetail());
-                        print(controller.userList[index].uid);
-                      },
-                      child: Container(
-                        padding: EdgeInsets.only(bottom: 20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              child: CircleAvatar(
-                                radius: 26,
-                                backgroundImage: NetworkImage(
-                                    controller.userList[index].profileImage),
+              child: StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('chats')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    return ListView.builder(
+                        itemCount: controller.userList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return GestureDetector(
+                            onTap: () {
+                              String uid = controller.userList[index].uid;
+                              controller.selectedUid = uid;
+                              // String selectedDocID = FirebaseFirestore.instance
+                              //     .collection('chats')
+                              //     .doc()
+                              //     .id;
+                              // FirebaseFirestore.instance.collection('chats').add({});
+                              // controller.selectedDocId =
+                              //     snapshot.data.docs[index].id;
+                              Get.to(MessageDetail());
+                              !FirebaseFirestore.instance
+                                      .collection('chats')
+                                      .id
+                                      .contains(controller.userList[index].uid)
+                                  ? null
+                                  : FirebaseFirestore.instance
+                                      .collection('chats')
+                                      .doc(controller.userList[index].uid)
+                                      .set({'uid': _user.currentUser.uid});
+                            },
+                            child: Container(
+                              padding: EdgeInsets.only(bottom: 20),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    child: CircleAvatar(
+                                      radius: 26,
+                                      backgroundImage: NetworkImage(controller
+                                          .userList[index].profileImage),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 20,
+                                  ),
+                                  Text(
+                                    controller.userList[index].name,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
                               ),
                             ),
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Text(
-                              controller.userList[index].name,
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
+                          );
+                        });
                   }),
             )
           ],

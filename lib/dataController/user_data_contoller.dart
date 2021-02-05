@@ -6,6 +6,13 @@ class UserController extends GetxController {
   List<UserModel> _userList = [];
   String _selectedUid;
   List<UserModel> get userList => _userList;
+  String _selectedDocId;
+
+  String get selectedDocId => _selectedDocId;
+
+  set selectedDocId(String value) {
+    _selectedDocId = value;
+  }
 
   String get selectedUid => _selectedUid;
 

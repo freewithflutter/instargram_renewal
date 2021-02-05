@@ -19,6 +19,7 @@ class _MessageDetailState extends State<MessageDetail> {
   final _user = FirebaseAuth.instance.currentUser;
   bool _error = false;
   bool _switch = true;
+
   @override
   void dispose() {
     _messages.dispose();
@@ -31,9 +32,7 @@ class _MessageDetailState extends State<MessageDetail> {
       appBar: AppBar(
         title: GestureDetector(
             onTap: () {
-              setState(() {
-                _switch = !_switch;
-              });
+              print(controller.selectedDocId);
             },
             child: Text('message')),
       ),
@@ -48,17 +47,23 @@ class _MessageDetailState extends State<MessageDetail> {
                     stream: FirebaseFirestore.instance
                         .collection('chats')
                         .doc(controller.selectedUid)
-                        .collection('message')
-                        .orderBy('timeStamp', descending: false)
                         .snapshots(),
                     builder: (context, snapshot) {
                       return ListView.builder(
-                        itemCount: snapshot.data.docs.length,
+                        itemCount: snapshot.data['message'].length,
                         itemBuilder: (BuildContext context, int index) {
                           return Container(
-                            child: Text(
-                                snapshot.data.docs[index].data()['message'],
-                                textAlign: TextAlign.end),
+                            child: Row(
+                              mainAxisAlignment: snapshot.data['message'][index]
+                                          ['uid'] ==
+                                      _user.uid
+                                  ? MainAxisAlignment.end
+                                  : MainAxisAlignment.start,
+                              children: [
+                                Text(snapshot.data['message'][index]['context'],
+                                    textAlign: TextAlign.end),
+                              ],
+                            ),
                           );
                         },
                       );
@@ -79,17 +84,28 @@ class _MessageDetailState extends State<MessageDetail> {
                   errorText: _error ? 'No value' : null,
                   suffixIcon: GestureDetector(
                     onTap: () {
+                      Map<String, dynamic> data = {
+                        'context': message,
+                        'timeStamp': DateTime.now(),
+                        'uid': _user.uid,
+                      };
+
                       message.isEmpty
                           ? null
                           : FirebaseFirestore.instance
                               .collection('chats')
-                              .doc()
-                              .collection('message')
-                              .add({
-                              'message': message,
-                              'timeStamp': DateTime.now()
+                              .doc(controller.selectedUid)
+                              .update({
+                              'message': FieldValue.arrayUnion([data])
                             });
+                      String aim =
+                          FirebaseFirestore.instance.collection('chats').id;
+                      print(aim);
 
+                      // .update({
+                      // 'message': message,
+                      // 'timeStamp': DateTime.now()
+                      // });
                       _messages.clear();
                     },
                     child: Icon(Icons.send),
