@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:instargram_renewal/dataController/google_login_controller.dart';
 import 'package:instargram_renewal/dataController/user_data_contoller.dart';
+import 'package:instargram_renewal/model/user_model.dart';
 import 'package:instargram_renewal/screen/message_screen/message_detail.dart';
 
 class Message extends StatefulWidget {
@@ -68,7 +69,8 @@ class _MessageState extends State<Message> {
               height: 500,
               child: StreamBuilder(
                   stream: FirebaseFirestore.instance
-                      .collection('chats')
+                      .collection('channel')
+                      .where('users', arrayContains: _user.currentUser.uid)
                       .snapshots(),
                   builder: (context, snapshot) {
                     return ListView.builder(
@@ -76,25 +78,21 @@ class _MessageState extends State<Message> {
                         itemBuilder: (BuildContext context, int index) {
                           return GestureDetector(
                             onTap: () {
+                              String partnerImage =
+                                  controller.userList[index].profileImage;
+                              controller.selectedPartnerImage = partnerImage;
+                              String partnerName =
+                                  controller.userList[index].name;
+                              controller.selectedPartnerName = partnerName;
                               String uid = controller.userList[index].uid;
-                              controller.selectedUid = uid;
-                              // String selectedDocID = FirebaseFirestore.instance
-                              //     .collection('chats')
-                              //     .doc()
-                              //     .id;
-                              // FirebaseFirestore.instance.collection('chats').add({});
-                              // controller.selectedDocId =
-                              //     snapshot.data.docs[index].id;
+
+                              controller.selectedDocId =
+                                  snapshot.data.docs[index].id;
                               Get.to(MessageDetail());
-                              !FirebaseFirestore.instance
-                                      .collection('chats')
-                                      .id
-                                      .contains(uid)
-                                  ? null
-                                  : FirebaseFirestore.instance
-                                      .collection('chats')
-                                      .doc(controller.userList[index].uid)
-                                      .set({'uid': _user.currentUser.uid});
+                              // FirebaseFirestore.instance
+                              //     .collection('channel')
+                              //     .doc()
+                              //     .set({'uid': _user.currentUser.uid});
                             },
                             child: controller.userList[index].uid ==
                                     _user.currentUser.uid

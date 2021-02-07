@@ -18,8 +18,7 @@ class _MessageDetailState extends State<MessageDetail> {
   final _messages = TextEditingController();
   final _user = FirebaseAuth.instance.currentUser;
   bool _error = false;
-  bool _switch = true;
-
+  bool isSameUser;
   @override
   void dispose() {
     _messages.dispose();
@@ -30,98 +29,195 @@ class _MessageDetailState extends State<MessageDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        iconTheme: IconThemeData(
+          color: Colors.black87,
+        ),
+        backgroundColor: Colors.white,
+        centerTitle: false,
+        elevation: 1,
         title: GestureDetector(
             onTap: () {
               print(controller.selectedDocId);
             },
-            child: Text('message')),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                GestureDetector(
+                  child: Icon(Icons.arrow_back_ios),
+                  onTap: () {
+                    Get.back();
+                  },
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                CircleAvatar(
+                    radius: 14,
+                    backgroundImage:
+                        NetworkImage(controller.selectedPartnerImage)),
+                SizedBox(
+                  width: 10,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      controller.selectedPartnerName,
+                      style: TextStyle(fontSize: 12, color: Colors.black87),
+                    ),
+                    Text(
+                      'userEmail@gmail.com',
+                      style: TextStyle(fontSize: 10, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ],
+            )),
+        actions: [],
       ),
-      body: Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Container(
-                color: Colors.redAccent,
-                child: StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection('chats')
-                        .doc(controller.selectedUid)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      return ListView.builder(
-                        itemCount: snapshot.data['message'].length,
+      body: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('channel')
+              .doc(controller.selectedDocId)
+              .collection('message')
+              .orderBy('timeStamp')
+              .snapshots(),
+          builder: (context, snapshot) {
+            return Container(
+              margin: EdgeInsets.only(top: 5),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Container(
+                      child: ListView.builder(
+                        itemCount: snapshot.data.docs.length,
                         itemBuilder: (BuildContext context, int index) {
                           return Container(
                             child: Row(
-                              mainAxisAlignment: snapshot.data['message'][index]
-                                          ['uid'] ==
-                                      _user.uid
-                                  ? MainAxisAlignment.end
-                                  : MainAxisAlignment.start,
+                              mainAxisAlignment:
+                                  snapshot.data.docs[index]['uid'] == _user.uid
+                                      ? MainAxisAlignment.end
+                                      : MainAxisAlignment.start,
                               children: [
-                                Text(snapshot.data['message'][index]['context'],
-                                    textAlign: TextAlign.end),
+                                Column(
+                                  children: [
+                                    snapshot.data.docs[index]['uid'] ==
+                                            _user.uid
+                                        ? Container()
+                                        : snapshot.data.docs[index]
+                                                    .data()['uid'] ==
+                                                snapshot
+                                                    .data
+                                                    .docs[index == 0
+                                                        ? index
+                                                        : index + 1]
+                                                    .data()['uid']
+                                            ? Container()
+                                            : CircleAvatar(
+                                                backgroundImage: NetworkImage(
+                                                    controller
+                                                        .selectedPartnerImage),
+                                              ),
+                                    Container(
+                                        padding: EdgeInsets.all(10),
+                                        margin: EdgeInsets.symmetric(
+                                            horizontal: 15, vertical: 5),
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                                width: 1.5,
+                                                color: Colors.grey
+                                                    .withOpacity(0.2)),
+                                            borderRadius:
+                                                BorderRadius.circular(30),
+                                            color: snapshot.data.docs[index]
+                                                        ['uid'] ==
+                                                    _user.uid
+                                                ? Colors.white
+                                                : Colors.grey
+                                                    .withOpacity(0.16)),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            print(snapshot.data.docs[index - 1]
+                                                    .data()['uid'] ==
+                                                snapshot.data.docs[index]
+                                                    .data()['uid']);
+                                          },
+                                          child: ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                                maxWidth: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.7),
+                                            child: Text(
+                                              snapshot.data.docs[index]
+                                                  ['context'],
+                                            ),
+                                          ),
+                                        )),
+                                  ],
+                                ),
                               ],
                             ),
                           );
                         },
-                      );
-                    }),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(16),
-              child: TextFormField(
-                onChanged: (value) => setState(() {
-                  message = value;
-                }),
-                controller: _messages,
-                textCapitalization: TextCapitalization.sentences,
-                autocorrect: true,
-                enableSuggestions: true,
-                decoration: InputDecoration(
-                  errorText: _error ? 'No value' : null,
-                  suffixIcon: GestureDetector(
-                    onTap: () {
-                      Map<String, dynamic> data = {
-                        'context': message,
-                        'timeStamp': DateTime.now(),
-                        'uid': _user.uid,
-                      };
-
-                      message.isEmpty
-                          ? null
-                          : FirebaseFirestore.instance
-                              .collection('chats')
-                              .doc(controller.selectedUid)
-                              .update({
-                              'message': FieldValue.arrayUnion([data])
-                            });
-                      String aim =
-                          FirebaseFirestore.instance.collection('chats').id;
-                      print(aim);
-
-                      // .update({
-                      // 'message': message,
-                      // 'timeStamp': DateTime.now()
-                      // });
-                      _messages.clear();
-                    },
-                    child: Icon(Icons.send),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: 1,
-                      color: Colors.black87,
+                      ),
                     ),
                   ),
-                ),
+                  Container(
+                    padding: EdgeInsets.all(16),
+                    child: TextFormField(
+                      onChanged: (value) => setState(() {
+                        message = value;
+                      }),
+                      controller: _messages,
+                      textCapitalization: TextCapitalization.sentences,
+                      autocorrect: true,
+                      enableSuggestions: true,
+                      decoration: InputDecoration(
+                        errorText: _error ? 'No value' : null,
+                        suffixIcon: GestureDetector(
+                          onTap: () {
+                            // String currentId = FirebaseFirestore.instance
+                            //     .collection('chats')
+                            //     .doc()
+                            //     .id;
+                            Map<String, dynamic> data = {
+                              'context': message,
+                              'timeStamp': DateTime.now(),
+                              'uid': _user.uid,
+                              'photoUrl': _user.photoURL
+                            };
+
+                            FirebaseFirestore.instance
+                                .collection('channel')
+                                .doc(controller.selectedDocId)
+                                .collection('message')
+                                .add(data);
+
+                            print(controller.selectedDocId);
+                            // .update({
+                            // 'message': message,
+                            // 'timeStamp': DateTime.now()
+                            // });as
+                            _messages.clear();
+                          },
+                          child: Icon(Icons.send),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            width: 1,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
-      ),
+            );
+          }),
     );
   }
 }
