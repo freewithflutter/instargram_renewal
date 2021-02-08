@@ -81,7 +81,7 @@ class _MessageDetailState extends State<MessageDetail> {
               .collection('channel')
               .doc(controller.selectedDocId)
               .collection('message')
-              .orderBy('timeStamp')
+              .orderBy('timeStamp', descending: true)
               .snapshots(),
           builder: (context, snapshot) {
             return Container(
@@ -92,10 +92,12 @@ class _MessageDetailState extends State<MessageDetail> {
                   Expanded(
                     child: Container(
                       child: ListView.builder(
+                        reverse: true,
                         itemCount: snapshot.data.docs.length,
                         itemBuilder: (BuildContext context, int index) {
                           return Container(
                             child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment:
                                   snapshot.data.docs[index]['uid'] == _user.uid
                                       ? MainAxisAlignment.end
@@ -103,23 +105,6 @@ class _MessageDetailState extends State<MessageDetail> {
                               children: [
                                 Column(
                                   children: [
-                                    snapshot.data.docs[index]['uid'] ==
-                                            _user.uid
-                                        ? Container()
-                                        : snapshot.data.docs[index]
-                                                    .data()['uid'] ==
-                                                snapshot
-                                                    .data
-                                                    .docs[index == 0
-                                                        ? index
-                                                        : index + 1]
-                                                    .data()['uid']
-                                            ? Container()
-                                            : CircleAvatar(
-                                                backgroundImage: NetworkImage(
-                                                    controller
-                                                        .selectedPartnerImage),
-                                              ),
                                     Container(
                                         padding: EdgeInsets.all(10),
                                         margin: EdgeInsets.symmetric(
@@ -138,12 +123,7 @@ class _MessageDetailState extends State<MessageDetail> {
                                                 : Colors.grey
                                                     .withOpacity(0.16)),
                                         child: GestureDetector(
-                                          onTap: () {
-                                            print(snapshot.data.docs[index - 1]
-                                                    .data()['uid'] ==
-                                                snapshot.data.docs[index]
-                                                    .data()['uid']);
-                                          },
+                                          onTap: () {},
                                           child: ConstrainedBox(
                                             constraints: BoxConstraints(
                                                 maxWidth: MediaQuery.of(context)
@@ -156,6 +136,19 @@ class _MessageDetailState extends State<MessageDetail> {
                                             ),
                                           ),
                                         )),
+                                    snapshot.data.docs[index]['uid'] ==
+                                            _user.uid
+                                        ? Container()
+                                        : snapshot.data.docs[index]
+                                                    .data()['uid'] ==
+                                                snapshot.data.docs[index + 1]
+                                                    .data()['uid']
+                                            ? Container()
+                                            : CircleAvatar(
+                                                backgroundImage: NetworkImage(
+                                                    controller
+                                                        .selectedPartnerImage),
+                                              ),
                                   ],
                                 ),
                               ],
