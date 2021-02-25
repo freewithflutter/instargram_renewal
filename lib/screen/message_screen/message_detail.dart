@@ -201,7 +201,7 @@ class _MessageDetailState extends State<MessageDetail> {
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
                             width: 1,
-                            color: Colors.black87,
+                            color: Colors.red,
                           ),
                         ),
                       ),

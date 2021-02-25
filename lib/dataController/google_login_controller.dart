@@ -38,6 +38,7 @@ class GoogleSigninController extends GetxController {
       await FirebaseAuth.instance.signInWithCredential(credential);
       isSigningIn = false;
 
+      // This is extra part
       QuerySnapshot snapshot =
           await FirebaseFirestore.instance.collection('users').get();
 
@@ -47,8 +48,6 @@ class GoogleSigninController extends GetxController {
       });
     }
   }
-
-  Future putUserdata() {}
 
   void logout() async {
     await googleSignIn.disconnect();
